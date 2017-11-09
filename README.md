@@ -7,7 +7,7 @@ Unlike the original, this fork simply tracks `request_time`s (in ms), with datad
 **THIS IS NOT HEAVILY TESTED YET**
 
 Here are the steps to enable Graphql-dog in your app. See below for details on each step:
-* Install the NPM package in your app: `npm install ??? --save`
+* Install the NPM package in your app: `npm install graphql-dog --save`
 * Import the package in your main js file: `import GraphQLDog from 'graphql-dog';`
 * Get an API key from the Optics web interface and configure the agent. Either:
   * Set the `DATADOG_API_KEY` environment variable to your API key
@@ -27,7 +27,7 @@ Here are the steps to enable Graphql-dog in your app. See below for details on e
 First, install the package
 
 ```
-npm install ?? --save
+npm install graphql-dog --save
 ```
 
 ## Configure
