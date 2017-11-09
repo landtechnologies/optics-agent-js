@@ -58,7 +58,6 @@ export const reportRequestEnd = (req) => {
 
   const queries = context.queries;
   const agent = context.agent;
-
   try {
     // Separate out resolvers into buckets by query. To determine
     // which query a resolver corresponds to in the case of multiple
@@ -109,7 +108,7 @@ export const reportRequestEnd = (req) => {
             durationMs = durationHrTimeToMS(resolverReport.endOffset)
                          - durationHrTimeToMS(resolverReport.startOffset);
             agent.datadog.histogram('graphql.type.request_time', durationMs,
-              [`type:${typeName}`, `field:${fieldName}`, `typeAndField:${typeName}.${fieldName}`]);
+              [`type:${typeName}`, `field:${fieldName}`, `type.field:${typeName}.${fieldName}`]);
           }
         });
       });

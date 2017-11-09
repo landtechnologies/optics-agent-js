@@ -18,10 +18,6 @@ import {
   koaMiddleware,
 } from './Instrument';
 
-import {
-  reportSchema,
-} from './Report';
-
 
 export default class Agent {
   constructor(options) {
@@ -31,7 +27,6 @@ export default class Agent {
       printReports, disabled,
     } = options || {};
 
-    this.datadogOpts = datadogOpts;
     this.debugFn = debugFn || console.log; // eslint-disable-line no-console
     this.disabled = !!disabled;
     this.normalizeVersion = normalizeVersion || defaultNV;
@@ -46,7 +41,6 @@ export default class Agent {
       return schema;
     }
     this.schema = instrumentSchema(schema, this);
-    reportSchema(this, schema);
     return this.schema;
   }
 

@@ -4,6 +4,8 @@
 
 Unlike the original, this fork simply tracks `request_time`s (in ms), with datadog tags specifying the graphql type, field and 'type.field'.  There is no special error logging, or tracking of number of which fields are used etc.
 
+**THIS IS NOT HEAVILY TESTED YET**
+
 Here are the steps to enable Graphql-dog in your app. See below for details on each step:
 * Install the NPM package in your app: `npm install ??? --save`
 * Import the package in your main js file: `import GraphQLDog from 'graphql-dog';`
