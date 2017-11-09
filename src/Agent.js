@@ -4,6 +4,7 @@
 // The Agent holds the configuration and all the in-memory state for
 // the server.
 
+import datadogMetrics from 'datadog-metrics';
 
 import {
   normalizeQuery as defaultNQ, normalizeVersion as defaultNV,
@@ -19,45 +20,25 @@ import {
 
 import {
   reportSchema,
-  sendStatsReport,
 } from './Report';
 
-export const MIN_REPORT_INTERVAL_MS = 10 * 1000;
-export const DEFAULT_REPORT_INTERVAL_MS = 60 * 1000;
 
 export default class Agent {
   constructor(options) {
     // Public options. See README.md for descriptions.
     const {
-      apiKey, debugFn, normalizeVersion, normalizeQuery,
-      reportIntervalMs, printReports, disabled
+      datadogOpts, debugFn, normalizeVersion, normalizeQuery,
+      printReports, disabled,
     } = options || {};
 
-    this.apiKey = apiKey || process.env.DATADOG_API_KEY;
+    this.datadogOpts = datadogOpts;
     this.debugFn = debugFn || console.log; // eslint-disable-line no-console
     this.disabled = !!disabled;
     this.normalizeVersion = normalizeVersion || defaultNV;
     this.normalizeQuery = normalizeQuery || defaultNQ;
     this.printReports = !!printReports;
-
-    this.reportIntervalMs = reportIntervalMs || DEFAULT_REPORT_INTERVAL_MS;
-    if (this.reportIntervalMs < MIN_REPORT_INTERVAL_MS) {
-      this.debugFn(
-        `Optics: minimum reportInterval is ${MIN_REPORT_INTERVAL_MS}. Setting reportInterval to minimum.`,
-      );
-      this.reportIntervalMs = MIN_REPORT_INTERVAL_MS;
-    }
-
-    // Internal state.
-
-    // Data we've collected so far this report period.
-    this.pendingResults = {};
-    // The wall clock time for the beginning of the current report period.
-    this.reportStartTime = +new Date();
-    // The HR clock time for the beginning of the current report
-    // period. We record this so we can get an accurate duration for
-    // the report even when the wall clock shifts or drifts.
-    this.reportStartHrTime = process.hrtime();
+    this.datadog = datadogMetrics;
+    this.datadog.init(datadogOpts || {});
   }
 
   instrumentSchema(schema) {

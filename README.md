@@ -2,12 +2,14 @@
 
 **A tracking agent for apollo GraphQL servers, for logging to Datadog. Forked from Apollo Optics agent, and uses datadog-metrics.**
 
+Unlike the original, this fork simply tracks `request_time`s (in ms), with datadog tags specifying the graphql type, field and 'type.field'.  There is no special error logging, or tracking of number of which fields are used etc.
+
 Here are the steps to enable Graphql-dog in your app. See below for details on each step:
 * Install the NPM package in your app: `npm install ??? --save`
 * Import the package in your main js file: `import GraphQLDog from 'graphql-dog';`
 * Get an API key from the Optics web interface and configure the agent. Either:
   * Set the `DATADOG_API_KEY` environment variable to your API key
-  * Set the API key and more with `GraphQLDog.configureAgent({ options });`
+  * Set the datadog options using the `datadogOpts` field in `GraphQLDog.configureAgent({ options });`
 * Instrument your app. In any order:
   * Instrument your schema: `GraphQLDog.instrumentSchema(executableSchema);`
   * Add the middleware: `expressServer.use(GraphQLDog.middleware());`
