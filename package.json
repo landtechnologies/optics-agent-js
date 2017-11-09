@@ -1,7 +1,7 @@
 {
-  "name": "optics-agent",
-  "version": "1.1.8",
-  "description": "Apollo Optics Agent for GraphQL-js",
+  "name": "graphql-dog",
+  "version": "0.1.0",
+  "description": "graphQL-js agent for Datadog  (forked from Apollo Optics agent)",
   "main": "dist/index.js",
   "scripts": {
     "build": "babel ./src --ignore test --out-dir ./dist",
@@ -10,18 +10,13 @@
     "lint": "eslint ."
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/apollostack/optics-agent-js.git"
+    "type": "git"
   },
   "keywords": [
     "graphql"
   ],
-  "author": "Meteor Development Group",
+  "author": "Meteor Development Group, LandInsight",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/apollostack/optics-agent-js/issues"
-  },
-  "homepage": "https://github.com/apollostack/optics-agent-js#readme",
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-eslint": "^7.1.1",

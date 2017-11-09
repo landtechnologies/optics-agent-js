@@ -13,7 +13,7 @@ let defaultAgent = null;
 export const configureAgent = (options) => {
   if (defaultAgent) {
     throw new Error(
-      'Optics Agent configuration already set. Make sure `configureAgent` is called only once and before any calls to `middleware`, `instrumentSchema`, or `instrumentHapiServer`.',
+      'GraphQLDog Agent configuration already set. Make sure `configureAgent` is called only once and before any calls to `middleware`, `instrumentSchema`, or `instrumentHapiServer`.',
     );
   }
 

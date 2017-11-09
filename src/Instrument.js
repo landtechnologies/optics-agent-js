@@ -31,11 +31,11 @@ const preRequest = (req) => {
     startHrTime: process.hrtime(),
     resolverCalls: [],
   };
-  req._opticsContext = context;  // eslint-disable-line no-param-reassign
+  req._datadogContext = context;  // eslint-disable-line no-param-reassign
 };
 
 const postRequest = (req) => {
-  const context = req._opticsContext;
+  const context = req._datadogContext;
   // context should always be set, but double check just in case.
   //
   // XXX consider error reporting. We might not want to `console.log`
@@ -103,9 +103,9 @@ export const instrumentHapiServer = (server) => {
 export const decorateField = (fn, fieldInfo) => {
   const decoratedResolver = (p, a, ctx, resolverInfo) => {
     // setup context and note start time.
-    const opticsContext = ctx && ctx.opticsContext;
+    const datadogContext = ctx && ctx.datadogContext;
 
-    if (!opticsContext) {
+    if (!datadogContext) {
       // This happens when `instrumentSchema` was called, but
       // `newContext` didn't get put in the graphql context correctly.
       //
@@ -116,20 +116,20 @@ export const decorateField = (fn, fieldInfo) => {
     }
 
     const resolverReport = {
-      startOffset: process.hrtime(opticsContext.startHrTime),
+      startOffset: process.hrtime(datadogContext.startHrTime),
       fieldInfo,
       resolverInfo,
       resolverContext: ctx,
     };
     // save the report object for when we want to send query traces and to
     // aggregate its statistics at the end of the request.
-    opticsContext.resolverCalls.push(resolverReport);
+    datadogContext.resolverCalls.push(resolverReport);
 
     // Call this when the resolver and all the Promises it returns
     // (if any) are complete.
     const finishRun = () => {
       // note end time.
-      resolverReport.endOffset = process.hrtime(opticsContext.startHrTime);
+      resolverReport.endOffset = process.hrtime(datadogContext.startHrTime);
     };
 
     // Actually run the resolver.
@@ -261,9 +261,9 @@ export const instrumentSchema = (schema) => {
 
   // add per query instrumentation
   addSchemaLevelResolveFunction(schema, (root, args, ctx, info) => {
-    const opticsContext = ctx.opticsContext;
-    if (opticsContext) {
-      reportRequestStart(opticsContext, info, ctx);
+    const datadogContext = ctx.datadogContext;
+    if (datadogContext) {
+      reportRequestStart(datadogContext, info, ctx);
     }
     return root;
   });
@@ -278,10 +278,10 @@ export const instrumentSchema = (schema) => {
 // The graphql `context` object is how we get state into the resolver
 // wrappers. For resolver level information gathering to work, the
 // user must call `newContext` once per query and place the return
-// value in the `opticsContext` field of the graphql-js `context`
+// value in the `datadogContext` field of the graphql-js `context`
 // argument.
 export const newContext = (req, agent) => {
-  let context = req._opticsContext;
+  let context = req._datadogContext;
   if (!context) {
     // This happens if the middleware isn't run correctly.
 
@@ -294,13 +294,13 @@ export const newContext = (req, agent) => {
     // probably won't fire, but this way optics code that assumes a
     // context will run correctly.
     preRequest(req);
-    context = req._opticsContext;
+    context = req._datadogContext;
   }
 
   // This does not really need to be set here. It could be set in
   // preRequest, if we threaded agent through there. Once we do that,
   // we could change the API to not require calling this as a function
-  // and instead just ask users to add `req.opticsContext` to their
+  // and instead just ask users to add `req.datadogContext` to their
   // graphql context. See:
   // https://github.com/apollostack/optics-agent-js/issues/46
   context.agent = agent;

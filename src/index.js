@@ -4,11 +4,11 @@ import { configureAgent, instrumentSchema, middleware,
 
 // export both as individual symbols and as a default object to
 // support both of these syntaxes:
-//   import OpticsAgent from 'optics-agent';
-//   import { middleware, instrumentSchema } from 'optics-agent';
+//   import GraphQLDog from 'graphql-dog';
+//   import { middleware, instrumentSchema } from 'graphql-dog';
 //
 // Or with CommonJS:
-//   var OpticsAgent = require('optics-agent');
+//   var GraphQLDog = require('graphql-dog');
 export default {
   configureAgent,
   instrumentSchema,

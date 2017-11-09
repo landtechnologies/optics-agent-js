@@ -448,7 +448,7 @@ export const reportTrace = (agent, context, info, resolvers) => {
 
 // called once per query by the middleware when the request ends.
 export const reportRequestEnd = (req) => {
-  const context = req._opticsContext;
+  const context = req._datadogContext;
   if (!context || !context.queries || !context.agent) {
     // Happens when non-graphql requests come through.
     return;

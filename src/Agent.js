@@ -30,36 +30,15 @@ export default class Agent {
     // Public options. See README.md for descriptions.
     const {
       apiKey, debugFn, normalizeVersion, normalizeQuery,
-      endpointUrl, proxyUrl, reportIntervalMs, printReports,
-      reportTraces, reportVariables, shutdownGracefully,
+      reportIntervalMs, printReports, disabled
     } = options || {};
-    // XXX We don't actually intend for these fields to be part of a public
-    //     stable API. https://github.com/apollostack/optics-agent-js/issues/51
-    this.apiKey = apiKey || process.env.OPTICS_API_KEY;
-    // XXX actually use debugFn
+
+    this.apiKey = apiKey || process.env.DATADOG_API_KEY;
     this.debugFn = debugFn || console.log; // eslint-disable-line no-console
-
-    // Ensure we have an api key. If not, print and disable the agent.
-    if (!this.apiKey) {
-      this.debugFn(
-        'Optics agent disabled: no API key specified. ' +
-        'Set the `apiKey` option to `configureAgent` or `new Agent`, ' +
-        'or set the `OPTICS_API_KEY` environment variable.',
-      );
-      this.disabled = true;
-      return;
-    }
-    this.disabled = false;
-
+    this.disabled = !!disabled;
     this.normalizeVersion = normalizeVersion || defaultNV;
     this.normalizeQuery = normalizeQuery || defaultNQ;
-    this.endpointUrl = (endpointUrl || process.env.OPTICS_ENDPOINT_URL ||
-                        'https://optics-report.apollodata.com/');
-    this.endpointUrl = this.endpointUrl.replace(/\/$/, '');
-    this.proxyUrl = proxyUrl || process.env.HTTPS_PROXY;
     this.printReports = !!printReports;
-    this.reportTraces = reportTraces !== false;
-    this.reportVariables = reportVariables !== false;
 
     this.reportIntervalMs = reportIntervalMs || DEFAULT_REPORT_INTERVAL_MS;
     if (this.reportIntervalMs < MIN_REPORT_INTERVAL_MS) {
@@ -79,29 +58,6 @@ export default class Agent {
     // period. We record this so we can get an accurate duration for
     // the report even when the wall clock shifts or drifts.
     this.reportStartHrTime = process.hrtime();
-
-    // Interval to send the reports. Per
-    // https://github.com/apollostack/optics-agent-js/issues/4 we may
-    // want to make this more complicated than just setInterval.
-    // XXX there's no way to stop this interval (eg, for tests)
-    this.reportTimer = setInterval(() => this.sendStatsReport(), this.reportIntervalMs);
-
-    // Shutdown gracefully on SIGINT and process.exit()
-    this.shutdownGracefully = shutdownGracefully !== false;
-    if (this.shutdownGracefully) {
-      process.on('exit', () => this.stop());
-      process.on('SIGINT', () => {
-        const isOnlyListener = process.listenerCount('SIGINT') === 1;
-        this.stop((err) => {
-          if (isOnlyListener) {
-            if (err && !process.exitCode) {
-              process.exitCode = 1;
-            }
-            process.exit();
-          }
-        });
-      });
-    }
   }
 
   instrumentSchema(schema) {
@@ -150,22 +106,4 @@ export default class Agent {
     }
   }
 
-  // XXX This is not part of the public API.
-  //     https://github.com/apollostack/optics-agent-js/issues/51
-  sendStatsReport(handler) {
-    if (!this.schema) {
-      this.debugFn('Optics agent: schema not instrumented. Make sure to call `instrumentSchema`.');
-      return;
-    }
-    // copy current report state and reset pending state for the next
-    // report.
-    const reportData = this.pendingResults;
-    const oldStartTime = this.reportStartTime;
-    const durationHr = process.hrtime(this.reportStartHrTime);
-    this.reportStartHrTime = process.hrtime();
-    this.reportStartTime = +new Date();
-    this.pendingResults = {};
-    // actually send
-    sendStatsReport(this, reportData, oldStartTime, this.reportStartTime, durationHr, handler);
-  }
 }
