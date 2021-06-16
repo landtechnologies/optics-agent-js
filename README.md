@@ -1,3 +1,8 @@
+## THIS HAS BEEN DEPRECATED
+
+We should not be using it anywhere in production.
+
+
 # graphql-dog
 
 **A tracking agent for apollo GraphQL servers, for logging to Datadog. Forked from Apollo Optics agent, and uses datadog-metrics.**
